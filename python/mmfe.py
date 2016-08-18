@@ -391,26 +391,18 @@ class MMFE:
         self.UDP_IP = widget.get_text()
 
         try:
-            self.mmfeID = self.ipAddr.index(self.UDP_IP)
+            mmfeID = int(self.UDP_IP[-3:])
         except:
             print "Warning: Did not find %s in list of valid IP addresses. Set mmfeID=0." % (self.UDP_IP)
-            self.mmfeID = 0
+            mmfeID = 0
 
-        word = '{0:04b}'.format(self.mmfeID)
-        for bit in xrange(len(word)):
-            self.vmm_cfg_sel[11 - bit] = int(word[bit])
-        print
-        print "Set MMFE8 IP address = %s" % (self.UDP_IP)
-        print "Set MMFE8 ID         = %s" % (self.mmfeID)
-        print "Does MMFE8 ID mean anything?"
-        print
+        self.set_mmfeID(mmfeID)
+            
+        print "Set MMFE8 IP address = %s" % (self.mmfeID)
 
-        last_three_digits = self.UDP_IP.split(".")[-1]
-        last_digit        = last_three_digits[-1]
-        last_digit_hex    = hex(int(last_digit))
-        message = "w 0x44A10150 %s" % (last_digit_hex)
-        print "Writing last digit of IP address: %s" % (last_digit_hex)
-        self.udp.udp_client(message, self.UDP_IP, self.UDP_PORT)
+    def set_mmfeID(self, ID):
+        self.mmfeID = ID;
+        
 
     def set_display(self, widget):
         word = '{0:05b}'.format(widget.get_active())

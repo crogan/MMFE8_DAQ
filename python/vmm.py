@@ -56,6 +56,8 @@ class VMM:
         self.channels         = []
         for ch in xrange(64):
             self.channels.append(Channel(ch))
+        self.mmfeID = 0
+        self.vmmID  = 0
 
     def get_channel_val(self):
         for ch in range(64):
@@ -64,3 +66,10 @@ class VMM:
                 self.reg[ch][i] = value[i]
         return self.reg
 
+    def set_mmfeID(self, ID):
+        self.mmfeID = ID
+
+    def set_vmmID(self, ID):
+        self.vmmID = ID
+
+    

@@ -213,6 +213,9 @@ class GUI:
         self.button_ping = gtk.Button("ping")
         self.button_ping.connect("clicked", self.ping_mmfe)
 
+        self.button_hardcode = gtk.Button("Load Hard-coded Config")
+        self.button_hardcode.connect("clicked", self.load_hardcode)
+
         self.box_ip = gtk.HBox()
         self.box_ip.pack_start(self.entry_ip,     expand=False)
         self.box_ip.pack_start(self.label_ip,     expand=False)
@@ -282,6 +285,7 @@ class GUI:
         self.box_mmfe.pack_start(self.box_mmfe_number,   expand=False)
         self.box_mmfe.pack_start(self.box_ip,            expand=False)
         self.box_mmfe.pack_start(self.box_mmfeID,        expand=False)
+        self.box_mmfe.pack_start(self.button_hardcode,   expand=False)
         self.box_mmfe.pack_start(self.box_vmmID,         expand=False)
         self.box_mmfe.pack_start(self.vspace(),          expand=False)
  
@@ -680,6 +684,66 @@ class GUI:
         self.window.show_all()
         self.window.connect("destroy", self.destroy)
 
+    def unmask_channel_hardcode(self, ich):
+        self.channel_SM[ich-1].set_active(0)
+
+    def mask_channel_hardcode(self, ich):
+        self.channel_SM[ich-1].set_active(1)
+
+    def threshold_hardcode(self, thresh):
+        self.vmm_sdt_menu.set_active(thresh)
+        
+    def set_hardcode(self, mmfeID, vmmID):
+        print
+        print "Setting hard-coded configuration for:"
+        print "   mmfe8 ID %s" % mmfeID
+        print "   vmm ID %s" % vmmID
+        print
+
+        # dummy example for syntax
+        if mmfeID is 0:
+            # un-mask all channels on this VMM
+            for ich in range(1,65):
+                self.unmask_channel_hardcode(ich)
+            # vmm specific settings
+            if vmmID is 0:
+                self.threshold_hardcode(200)
+                self.mask_channel_hardcode(10)
+            if vmmID is 1:
+                self.threshold_hardcode(201)
+                self.mask_channel_hardcode(11)
+            if vmmID is 2:
+                self.threshold_hardcode(202)
+                self.mask_channel_hardcode(12)
+            if vmmID is 3:
+                self.threshold_hardcode(203)
+                self.mask_channel_hardcode(13)
+            if vmmID is 4:
+                self.threshold_hardcode(204)
+                self.mask_channel_hardcode(14)
+            
+            
+        
+    def load_hardcode(self, widget):
+        print
+        print "Loading hard-coded presets for MMFE %s" % self.current_mmfe 
+        print
+
+        current_vmm = self.current_vmm
+
+        mmfe = self.MMFEs[self.current_mmfe] 
+        ivmm = 0
+        for vmm in mmfe.VMMs:
+            self.current_vmm = ivmm
+            self.refresh_vmm_options()
+            self.refresh_channel_options()
+            self.set_hardcode(mmfe.mmfeID, ivmm)
+            ivmm = ivmm + 1
+
+        self.current_vmm = current_vmm
+        self.refresh_vmm_options()
+        self.refresh_channel_options()
+        
     def destroy(self, widget):
         print
         print "Goodbye from the MMFE8 GUI!"
