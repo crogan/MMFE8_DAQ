@@ -641,10 +641,10 @@ class GUI:
             self.vmm_sg_menu.set_active(5)
             self.vmm_stc_menu.set_active(0)
             self.vmm_sc8b_menu.set_active(3)
-            self.vmm_sdt_menu.set_active(220)
-            self.vmm_sdp2_menu.set_active(120)
+            self.vmm_sdt_menu.set_active(500)
+            self.vmm_sdp2_menu.set_active(200)
             for obj in [self.vmm_sbft, self.vmm_sbfp, self.vmm_sbfm, self.vmm_scmx, self.vmm_sfa,
-                        self.vmm_sfm,  self.vmm_s8b,  self.vmm_spdc,
+                        self.vmm_sfm,  self.vmm_s8b,  self.vmm_spdc, self.vmm_sdcka
                         ]:
                 obj.set_active(1)
             for obj in [self.vmm_sfam_menu,  self.vmm_st_menu,   self.vmm_stot_menu,
@@ -700,30 +700,85 @@ class GUI:
         print "   vmm ID %s" % vmmID
         print
 
-        # dummy example for syntax
-        if mmfeID is 0:
-            # un-mask all channels on this VMM
-            for ich in range(1,65):
-                self.unmask_channel_hardcode(ich)
-            # vmm specific settings
-            if vmmID is 0:
-                self.threshold_hardcode(200)
-                self.mask_channel_hardcode(10)
-            if vmmID is 1:
-                self.threshold_hardcode(201)
-                self.mask_channel_hardcode(11)
-            if vmmID is 2:
-                self.threshold_hardcode(202)
-                self.mask_channel_hardcode(12)
-            if vmmID is 3:
-                self.threshold_hardcode(203)
-                self.mask_channel_hardcode(13)
-            if vmmID is 4:
-                self.threshold_hardcode(204)
-                self.mask_channel_hardcode(14)
-            
-            
-        
+        for ich in range(1,65):
+            self.unmask_channel_hardcode(ich)
+
+        hardcodes = [(105, 0, 320, [1, 3, 17, 29, 43]),
+                     (105, 1, 320, [4]),
+                     (105, 2, 220, [2]),
+                     (105, 3, 260, []),
+                     (105, 4, 220, [1, 2, 3, 4]),
+                     (105, 5, 240, [1]),
+                     (105, 6, 240, [2, 22, 24, 63]),
+                     (105, 7, 240, [3, 64]),
+                     (106, 0, 220, []),
+                     (106, 1, 240, [38, 41, 44, 46, 49]),
+                     (106, 2, 320, [2, 3, 4, 8]),
+                     (106, 3, 260, []),
+                     (106, 4, 280, [50]),
+                     (106, 5, 280, []),
+                     (106, 6, 260, [1, 27, 50]),
+                     (106, 7, 280, [2, 3, 19, 20, 54, 56, 63]),
+                     (107, 0, 420, [1, 22, 29, 32, 36, 40]),
+                     (107, 1, 380, [15,23,25]),
+                     (107, 2, 360, [1, 4, 12, 41,46, 49, 59]),
+                     (107, 3, 400, [1, 2, 3, 15, 22, 24, 32, 35, 52]),
+                     (107, 4, 420, [15, 22, 25, 38, 48, 55, 61]),
+                     (107, 5, 420, [1, 4, 17, 20, 27, 30, 33, 37, 43, 50, 63]),
+                     (107, 6, 420, [1, 6, 9, 12, 16, 19, 29, 32, 36, 39, 42, 49, 56]),
+                     (107, 7, 460, [5, 12, 19, 28, 35, 52, 62]),
+                     (111, 0, 600, [2, 3, 7, 10, 26, 27, 36, 42, 48, 62]),
+                     (111, 1, 600, [1, 4, 5, 8, 11, 12, 18, 21, 31, 34, 36, 41, 48, 51]),
+                     (111, 2, 520, [7, 10, 17, 30, 34, 38, 51,54, 64]),
+                     (111, 3, 500, [2, 3, 5, 6, 37]),
+                     (111, 4, 560, [1, 2, 3, 4, 23, 53]),
+                     (111, 5, 480, [12, 22, 32, 36, 56, 63]),
+                     (111, 6, 520, [53]),
+                     (111, 7, 460, [1, 2, 19, 26, 29, 36, 52]),
+                     (116, 0, 480, [1, 2, 26, 28]),
+                     (116, 1, 500, [2, 51]),
+                     (116, 2, 480, [1, 2, 3, 4, 5, 29, 31]),
+                     (116, 3, 400, [1, 2, 5, 8, 10, 18, 20, 31, 33, 38, 40]),
+                     (116, 4, 440, [1, 2, 35]),
+                     (116, 5, 420, [1, 2, 3, 36, 64]),
+                     (116, 6, 460, [3, 38, 49, 52]),
+                     (116, 7, 500, [2, 5, 63, 64]),
+                     (117, 0, 340, [1, 2, 33]),
+                     (117, 1, 360, [5]),
+                     (117, 2, 800, []),
+                     (117, 3, 280, [1, 18, 45]),
+                     (117, 4, 280, []),
+                     (117, 5, 320, [1, 2, 3, 4, 5, 61]),
+                     (117, 6, 380, [2, 47]),
+                     (117, 7, 400, [1, 2, 3, 30]),
+                     (118, 0, 340, [1]),
+                     (118, 1, 320, []),
+                     (118, 2, 300, [1, 6, 31, 33]),
+                     (118, 3, 340, [43, 45]),
+                     (118, 4, 340, []),
+                     (118, 5, 300, []),
+                     (118, 6, 300, [1, 3, 4]),
+                     (118, 7, 300, [3, 63]),
+                     (119, 0, 320, []),
+                     (119, 1, 300, [5]),
+                     (119, 2, 300, []),
+                     (119, 3, 320, [55]),
+                     (119, 4, 300, []),
+                     (119, 5, 300, [2]),
+                     (119, 6, 320, []),
+                     (119, 7, 280, [64]),
+                     ]
+
+        for (_mmfeID, _vmmID, _thr, _chans) in hardcodes:
+            if mmfeID != _mmfeID:
+                continue
+            if vmmID  != _vmmID:
+                continue
+            self.threshold_hardcode(_thr)
+            for _chan in _chans:
+                self.mask_channel_hardcode(_chan)
+                print "MMFE", _mmfeID, "VMM", _vmmID, "CH", _chan 
+
     def load_hardcode(self, widget):
         print
         print "Loading hard-coded presets for MMFE %s" % self.current_mmfe 
@@ -957,7 +1012,6 @@ class GUI:
             return [ mmfe.VMMs[self.current_vmm] ]
 
     def vmm_callback_bit(self, widget, register):
-
         for mmfe in self.current_MMFEs():
             for vmm in self.current_VMMs(mmfe):
                 vmm.globalreg[register] = 1 if widget.get_active() else 0
@@ -1044,6 +1098,7 @@ class GUI:
         self.vmm_sbfm.set_active(     vmm.globalreg[registers.SBFM])
         self.vmm_slg.set_active(      vmm.globalreg[registers.SLG])
         self.vmm_scmx.set_active(     vmm.globalreg[registers.SCMX])
+        self.vmm_sfa.set_active(      vmm.globalreg[registers.SFA])
         self.vmm_sfm.set_active(      vmm.globalreg[registers.SFM])
         self.vmm_sng.set_active(      vmm.globalreg[registers.SNG])
         self.vmm_sttt.set_active(     vmm.globalreg[registers.STTT])
@@ -1052,7 +1107,7 @@ class GUI:
         self.vmm_s6b.set_active(      vmm.globalreg[registers.S6b])
         self.vmm_spdc.set_active(     vmm.globalreg[registers.SPDC])
         self.vmm_sdcks.set_active(    vmm.globalreg[registers.SDCKS])
-        self.vmm_sdcks.set_active(    vmm.globalreg[registers.SDCKA])
+        self.vmm_sdcka.set_active(    vmm.globalreg[registers.SDCKA])
         self.vmm_sdck6b.set_active(   vmm.globalreg[registers.SDCK6b])
         self.vmm_sdrv.set_active(     vmm.globalreg[registers.SDRV])
         self.vmm_stpp.set_active(     vmm.globalreg[registers.STPP])
