@@ -1,0 +1,4 @@
+mmfei = 0; vmmis = [0,3]; ThresholdDACs = {0:120, 3:120}; TestPulseDAC=120; SM={0:[0],3:[0]}; ST={0:[0,8],3:[0,8]}; EnableReadout=range(8); ConfigureLoad=[0,3]; ip=101;
+#
+#mmfei = 1; vmmis = [0]; ThresholdDACs = {0:120}; TestPulseDAC=120; SM={0:[0]}; ST={0:[0,8]}; EnableReadout=range(8); ConfigureLoad=[0]; ip=102;
+#
