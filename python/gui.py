@@ -163,21 +163,14 @@ class GUI:
         self.button_configs.pack_start(self.button_write_config_all, expand=True)
         self.button_configs.pack_start(self.button_print_config,     expand=True)
 
-        self.label_internal_trigger =  gtk.Label("")
-        self.label_internal_trigger.set_markup('<span color="red"> Internal Trigger </span>')
-        self.button_internal_trigger = gtk.ToggleButton("Internal Trigger [OFF]")
-        self.button_internal_trigger.connect("clicked", self.internal_trigger)
+        self.button_internal_trigger       = gtk.Button("")
+        self.button_external_trigger       = gtk.Button("")
+        self.button_external_trigger_pulse = gtk.Button("")
+
+        self.button_internal_trigger      .connect("clicked", self.internal_trigger)
+        self.button_external_trigger      .connect("clicked", self.external_trigger)
+        self.button_external_trigger_pulse.connect("clicked", self.external_trigger_pulse)
         
-        self.label_external_trigger =  gtk.Label("")
-        self.label_external_trigger.set_markup('<span color="red"> External Trigger </span>')
-        self.button_external_trigger = gtk.ToggleButton("External Trigger [OFF]")
-        self.button_external_trigger.connect("clicked", self.external_trigger)
-
-        self.label_external_trigger_w_pulse =  gtk.Label("")
-        self.label_external_trigger_w_pulse.set_markup('<span color="red"> External Trigger W/ Pulse </span>')
-        self.button_external_trigger_w_pulse = gtk.ToggleButton("External Trigger W/ Pulse [OFF]")
-        self.button_external_trigger_w_pulse.connect("clicked", self.external_trigger_w_pulse)
-
         self.button_ext_trig_pulse = gtk.Button("Send External Trigger")
         self.button_ext_trig_pulse.connect("clicked", self.send_external_trig)
         
@@ -302,15 +295,15 @@ class GUI:
         self.box_mmfe.pack_start(self.button_SystemInit,       expand=False)
         self.box_mmfe.pack_start(self.vspace(),                expand=False)
 
-        self.box_mmfe.pack_start(self.button_internal_trigger, expand=False)
-        self.box_mmfe.pack_start(self.button_external_trigger, expand=False)
-        self.box_mmfe.pack_start(self.button_external_trigger_w_pulse, expand=False)
-        self.box_mmfe.pack_start(self.button_leaky_readout,    expand=False)
-        self.box_mmfe.pack_start(self.box_pulses,           expand=False)
-        self.box_mmfe.pack_start(self.box_acq_reset_count,  expand=False)
-        self.box_mmfe.pack_start(self.box_acq_reset_hold,   expand=False)
-        self.box_mmfe.pack_start(self.box_user_udp,         expand=False)
-        self.box_mmfe.pack_start(self.vspace(),             expand=False)
+        self.box_mmfe.pack_start(self.button_internal_trigger,       expand=False)
+        self.box_mmfe.pack_start(self.button_external_trigger,       expand=False)
+        self.box_mmfe.pack_start(self.button_external_trigger_pulse, expand=False)
+        self.box_mmfe.pack_start(self.button_leaky_readout,          expand=False)
+        self.box_mmfe.pack_start(self.box_pulses,                    expand=False)
+        self.box_mmfe.pack_start(self.box_acq_reset_count,           expand=False)
+        self.box_mmfe.pack_start(self.box_acq_reset_hold,            expand=False)
+        self.box_mmfe.pack_start(self.box_user_udp,                  expand=False)
+        self.box_mmfe.pack_start(self.vspace(),                      expand=False)
 
         self.box_mmfe.pack_start(self.button_start,          expand=False)
         self.box_mmfe.pack_start(self.button_read_XADC,      expand=False)
@@ -836,21 +829,27 @@ class GUI:
         for mmfe in self.current_MMFEs():
             mmfe.leaky_readout(widget)
 
+    def label_toggle(self, widget, on, name):
+        color = "green" if on else "red"
+        text  = "ON"    if on else "OFF"
+        for child in widget.get_children():
+            label = "%s <span color='%s'><b>%s</b></span>  [click to toggle]" % (name, color, text)
+            child.set_markup(label)
+
     def internal_trigger(self, widget):
-        widget.set_label("Internal Trigger [ON]" if widget.get_active() else "Internal Trigger [OFF]")
         for mmfe in self.current_MMFEs():
-            mmfe.internal_trigger(widget)
+            mmfe.toggle_internal_trigger()
+            self.label_toggle(widget, mmfe.internal_trigger_on, "Internal Trigger")
 
     def external_trigger(self, widget):
-        widget.set_label("External Trigger [ON]" if widget.get_active() else "External Trigger [OFF]")
         for mmfe in self.current_MMFEs():
-            mmfe.external_trigger(widget)
+            mmfe.toggle_external_trigger()
+            self.label_toggle(widget, mmfe.external_trigger_on, "External Trigger")
 
-    def external_trigger_w_pulse(self, widget):
-        widget.set_label("External Trigger W/ Pulse [ON]" if widget.get_active() else "External Trigger W/ Pulse [OFF]")
+    def external_trigger_pulse(self, widget):
         for mmfe in self.current_MMFEs():
-            mmfe.external_trigger_w_pulse(widget)
-
+            mmfe.toggle_external_trigger_pulse()
+            self.label_toggle(widget, mmfe.external_trigger_pulse_on, "External Trigger w/Pulse")
 
     def set_pulses(self, widget):
         try:
@@ -1077,6 +1076,10 @@ class GUI:
         self.entry_acq_reset_hold.set_text(str(mmfe.acq_reset_hold))
         self.entry_user_udp.set_text(mmfe.udp_message)
         self.entry_mmfeID.set_text(str(mmfe.mmfeID))
+
+        self.label_toggle(self.button_internal_trigger,       mmfe.internal_trigger_on,       "Internal Trigger")
+        self.label_toggle(self.button_external_trigger,       mmfe.external_trigger_on,       "External Trigger")
+        self.label_toggle(self.button_external_trigger_pulse, mmfe.external_trigger_pulse_on, "External Trigger w/Pulse")
 
         self.combo_display.set_active(convert_to_int(mmfe.vmm_cfg_sel[16 : 16-5 : -1]))
 

@@ -43,7 +43,10 @@ class MMFE:
         self.pulses          = 0
         self.acq_reset_count = 0
         self.acq_reset_hold  = 0
-        self.ext_trig_on     = 0
+
+        self.internal_trigger_on       = 0
+        self.external_trigger_on       = 0
+        self.external_trigger_pulse_on = 0
 
         self.mmfeID = 0
         self.ipAddr = ["127.0.0.1",
@@ -155,8 +158,8 @@ class MMFE:
 
     def check_for_data(self):
         counter = 0
-        print "hi", self.ext_trig_on
-        while self.ext_trig_on==1:
+        print "hi", self.external_trigger_on
+        while self.external_trigger_on:
             counter = counter + 1
             start = time.time()
             check_reading = self.udp.udp_client("r 0x44A10144 1", self.UDP_IP, self.UDP_PORT)
@@ -259,24 +262,25 @@ class MMFE:
         self.readout_runlength[25] = 1 if widget.get_active() else 0
         self.write_readout_runlength()
 
-    def internal_trigger(self, widget):
-        self.readout_runlength[24] = 1 if widget.get_active() else 0
+    def toggle_internal_trigger(self):
+        self.internal_trigger_on = not self.internal_trigger_on
+        self.readout_runlength[24] = 1 if self.internal_trigger_on else 0
         self.write_readout_runlength()
 
-    def external_trigger_w_pulse(self, widget):
-        if widget.get_active():
+    def toggle_external_trigger(self):
+        self.external_trigger_on = not self.external_trigger_on
+        self.readout_runlength[26] = 1 if self.external_trigger_on else 0
+        self.write_readout_runlength()
+
+    def toggle_external_trigger_pulse(self):
+        self.external_trigger_pulse_on = not self.external_trigger_pulse_on
+        if self.external_trigger_pulse_on:
             message = "w 0x44A1013C 1"
             self.udp.udp_client(message, self.UDP_IP, self.UDP_PORT)
             print "Ext Trig Signals are accompanied by a pulse"
         else:
             message = "w 0x44A1013C 0"
             self.udp.udp_client(message, self.UDP_IP, self.UDP_PORT)
-
-    def external_trigger(self, widget):
-        self.readout_runlength[26] = 1 if widget.get_active() else 0
-        self.ext_trig_on = self.readout_runlength[26]
-        print "self_ext_trig_on", self.ext_trig_on
-        self.write_readout_runlength()
 
     def set_pulses(self, widget, entry=None):
         self.pulses = int(widget.get_text())
