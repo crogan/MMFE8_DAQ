@@ -13,20 +13,26 @@ import socket
 
 class udp_stuff:
 
-    def __init__(self):
-        self.UDP_IP = ""
+    def __init__(self, dry=False):
+        self.UDP_IP   = ""
         self.UDP_PORT = 50001
+        self.dry      = dry
 
     def udp_client(self, MESSAGE, myUDP_IP, myUDP_PORT=50001, ping=False, debug=False):
         self.UDP_IP   = myUDP_IP 
         self.UDP_PORT = myUDP_PORT       
-        sock = socket.socket(socket.AF_INET,    # Internet
-                             socket.SOCK_DGRAM) # UDP 
-        sock.settimeout(2)
 
         MESSAGE = MESSAGE.replace("\0", "")
         MESSAGE = MESSAGE.replace("\n", "")
         MESSAGE += " \0\n"
+
+        if self.dry:
+            print "UDP :: %s :: %r" % (myUDP_IP, MESSAGE)
+            return
+
+        sock = socket.socket(socket.AF_INET,    # Internet
+                             socket.SOCK_DGRAM) # UDP 
+        sock.settimeout(2)
 
         if ping:
             attempt = 0

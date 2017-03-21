@@ -40,9 +40,10 @@ class GUI:
         print "Loading MMFE8 GUI with %i MMFE" % (nmmfes)
         print 
 
+        self.dry = "--dry" in sys.argv
         self.MMFEs = []
         for i in xrange(nmmfes):
-            self.MMFEs.append(MMFE())
+            self.MMFEs.append(MMFE(self.dry))
 
         self.tv = gtk.TextView()
         self.tv.set_editable(False)

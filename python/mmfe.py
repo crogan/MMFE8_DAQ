@@ -11,7 +11,7 @@ nvmms = 8
 
 class MMFE:
 
-    def __init__(self):
+    def __init__(self, dry=False):
 
         print "Creating instance of MMFE"
 
@@ -19,10 +19,11 @@ class MMFE:
         for _ in range(nvmms):
             self.VMMs.append(VMM())
 
-        self.udp         = udp_stuff()
+        self.udp         = udp_stuff(dry)
         self.UDP_PORT    = 50001
         self.UDP_IP      = "192.168.0.000"
         self.udp_message = "r 0x44A1xxxx 0x1"
+        self.dry         = dry
 
         self.vmm_load             = np.zeros((32), dtype=int)
         self.vmm_cfg_sel          = np.zeros((32), dtype=int)
@@ -134,7 +135,8 @@ class MMFE:
 
                 message = "w %s %s" % (vmm_config_address, " ".join(words_to_write))
                 self.udp.udp_client(message, self.UDP_IP, self.UDP_PORT)
-                time.sleep(0.1)
+                if not self.dry:
+                    time.sleep(0.1)
 
                 words_to_write = []
                 vmm_config_address = "0x{0:X}".format(int(vmm_config_address, base=16) + 4*chunk_size)
@@ -321,7 +323,8 @@ class MMFE:
                 self.write_vmm_config(None, vmm)
                 self.system_init(None)
                 self.system_load(None)
-                time.sleep(1)
+                if not self.dry:
+                    time.sleep(1)
                 self.vmm_cfg_sel[ivmm] = 0
 
     def vmm_load_readout(self, widget):
@@ -336,7 +339,8 @@ class MMFE:
         self.control[0] = 1
         self.write_control()
         
-        time.sleep(0.1)
+        if not self.dry:
+            time.sleep(0.1)
         
         self.control[0] = 0
         self.write_control()
@@ -349,7 +353,8 @@ class MMFE:
         self.control[0] = 1
         self.write_control()
 
-        time.sleep(1)
+        if not self.dry:
+            time.sleep(1)
 
         self.control[0] = 0
         self.write_control()
@@ -358,7 +363,8 @@ class MMFE:
         self.control[1] = 1
         self.write_control()
 
-        time.sleep(1)
+        if not self.dry:
+            time.sleep(1)
 
         self.control[1] = 0
         self.write_control()
@@ -367,7 +373,8 @@ class MMFE:
         self.control[3] = 1
         self.write_control()
 
-        time.sleep(1)
+        if not self.dry:
+            time.sleep(1)
 
         self.control[3] = 0
         self.write_control()
