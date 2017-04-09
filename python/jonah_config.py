@@ -73,7 +73,7 @@ def newcal(mmfei, vmmis, ThresholdDACs, TestPulseDAC,
             gui.channel_callback_bit(gui.channel_SM[channel-1], channel-1, index.SM)
         for channel in SM[vmmi]:
             announce(" %s VMM %s, mask CH %2s" % (mmfe, vmmi, channel))
-            gui.channel_SM[channel-1].set_active(0)
+            gui.channel_SM[channel-1].set_active(1)
             gui.channel_callback_bit(gui.channel_SM[channel-1], channel-1, index.SM)
         if not SM[vmmi]:
             announce(" %s VMM %s, mask nothing" % (mmfe, vmmi))
@@ -108,7 +108,7 @@ def newcal(mmfei, vmmis, ThresholdDACs, TestPulseDAC,
         gui.button_external_trigger.clicked()
         if isExtPulseTrig:
             announce(" %s enable external trigger w/pulse" % (mmfe))
-            gui.button_external_trigger_w_pulse.clicked()
+            gui.button_external_trigger_pulse.clicked()
 
 
     if not quiet:
@@ -128,7 +128,7 @@ class palette:
 #########################################################################################################
 
 # load the config. beware USER ERROR.
-if len(sys.argv) != 3:
+if len(sys.argv) < 3:
     sys.exit("Fatal: please follow this format: python jonah_config.py NBOARDS CONFIG")
 if not os.path.isfile(sys.argv[2]):
     sys.exit("Fatal: %s is not a file. Exiting." % (sys.argv[2]))
