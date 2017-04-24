@@ -51,7 +51,7 @@ def main():
         command   = words.pop(0)
 
         # delimit by BC
-        bc = header_bc[-4:]
+        bc = header_bc[-5:]
         if bc not in bcs:
             # new bc!
             if len(bcs) > 0:
@@ -87,7 +87,7 @@ def display(bc, boards, hits, preamble=False):
         print "Using geometry of : Run %s" % (ops.r)
         print "Strips per char   : %i"     % (channels / int(ops.b))
         print
-    print "BCID = 0x%s = %i" % (bc, int(bc, base=16))
+    print "Trigger = 0x%s = %i" % (bc, int(bc, base=16))
     print
     boards = ordered_boards()
     for board in boards:
@@ -130,7 +130,9 @@ class color:
 
 def ordered_boards():
     ops = options()
-    if int(ops.r) >= 3515:
+    if int(ops.r) >= 3518:
+        return ["118", "116", "102", "119", "106", "107", "117", "105"][::-1]
+    elif int(ops.r) >= 3515:
         return ["111", "116", "117", "119", "106", "107", "118", "105"][::-1]
     elif int(ops.r) >= 3513:
         return ["111", "116", "101", "109", "117", "102", "107", "105"][::-1]
