@@ -36,7 +36,8 @@ def main():
         else:
             lines = open(ops.i).readlines()
     else:
-        popen = subprocess.Popen(["tail", "-n 1000", ops.i],
+        cmd = "tail" if ops.l else "head"
+        popen = subprocess.Popen([cmd, "-n 1000", ops.i],
                                  stdout=subprocess.PIPE, 
                                  stderr=subprocess.PIPE)
         lines, errors = popen.communicate()

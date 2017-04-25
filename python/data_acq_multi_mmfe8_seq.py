@@ -1,6 +1,6 @@
 # Sequential data reading from the boards, depends on mmfe8_daq
 
-# A.Wang, last edited Aug 11, 2016
+# A.Wang, last edited Feb 26, 2017
 
 import time
 import numpy as np
@@ -51,9 +51,10 @@ class data_acq:
             if self.reading is 1:
                 found = MMFEs[0].check_for_data_flag()
                 if found is 1:
-                    bcidtemp = MMFEs[0].readOut_BCID(0)
+                    bcidtemp,ntrigtemp = MMFEs[0].readOut_BCID(0)
                     if (bcidold == bcidtemp):
                         continue
+                    print "NTRIG: ",ntrigtemp
                     bcidold = bcidtemp
                     with cond:
                         cond.notify_all()
@@ -64,15 +65,25 @@ class data_acq:
         bcidnow = []
         ind = 0
         start = 0
+        warningFlag = False # for ntrigger mismatch
         while not self.exit.is_set():
             if self.reading is 0:
                 break
             with cond:
                 cond.wait()
                 start = time.time()
+                ind = 0
+                eventNTrig = -1
+                if (warningFlag):
+                    print "WARNING!: NTRIG of MMFE8s are mismatched!"
                 for board in MMFEs:
+                    bcidt, ntrigt = board.readOut_BCID(0)
+                    if (ind == 0):
+                        eventNTrig = ntrigt
+                    if (ntrigt != eventNTrig):
+                        warningFlag = True
+                    bcidnow.append(bcidt)
                     ind = ind + 1
-                    bcidnow.append(board.readOut_BCID(0))
                     board.start(0)
                 cond2.acquire()
                 cond2.notify()
@@ -105,7 +116,12 @@ if __name__=="__main__":
         data_take.reading = 1
         for thread in threads:
             thread.start()
-    user_input = raw_input("To stop data taking, enter 0: ")
+
+    try:
+        user_input = raw_input("To stop data taking, enter 0: ")
+    except KeyboardInterrupt:
+        user_input = "0"
+
     if user_input is "0":
         print "oops, we stopped!"
         data_take.shutdown()

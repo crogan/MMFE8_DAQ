@@ -88,7 +88,10 @@ class MMFE:
         '''continuous checking for data'''
         msg = "r 0x44A10144 1" # read read_data variable in FPGA
         check_reading = self.udp.udp_client(msg, self.UDP_IP, self.UDP_PORT)
-        check_reading_str = check_reading.split()
+        try:
+            check_reading_str = check_reading.split()
+        except AttributeError:
+            print check_reading
 #        print check_reading_str #comment this out later!
         ready = 0
 #        print check_reading_str[2]
@@ -113,7 +116,8 @@ class MMFE:
         if (self.num_trigOld > num_trig):
             self.cyclenum = self.cyclenum + 1
         self.num_trigOld = num_trig
-        return self.bcid_reg
+        #print "NTRIG: ",num_trig
+        return self.bcid_reg, self.num_trigOld
 
     def daq_readOut_quiet(self, board_id):
         data       = None
@@ -156,7 +160,7 @@ class MMFE:
         else:
             cycles = 80 / peeks_per_cycle
             remainder = 0
-        myfile = open('mmfe8TestQuiet.dat', 'a')
+        myfile = open('../../work/mmfe8TestQuiet.dat', 'a')
 #        myfile = open('mmfe8TestQuiet_%i.adat' %(self.mmfeID), 'a')
 
         for cycle in reversed(xrange(1+cycles)):
