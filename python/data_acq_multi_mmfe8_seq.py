@@ -74,8 +74,6 @@ class data_acq:
                 start = time.time()
                 ind = 0
                 eventNTrig = -1
-                if (warningFlag):
-                    print "WARNING!: NTRIG of MMFE8s are mismatched!"
                 for board in MMFEs:
                     bcidt, ntrigt = board.readOut_BCID(0)
                     if (ind == 0):
@@ -85,6 +83,9 @@ class data_acq:
                     bcidnow.append(bcidt)
                     ind = ind + 1
                     board.start(0)
+                if (warningFlag):
+                    print "WARNING!: NTRIG of MMFE8s are mismatched!"
+                warningFlag = False
                 cond2.acquire()
                 cond2.notify()
                 cond2.release()
