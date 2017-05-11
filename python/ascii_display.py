@@ -183,7 +183,7 @@ def display(bc, boards, hits, preamble=False):
         flipped = boards.index(board) not in [0, 3, 5, 6] and not ops.t # trigger flips internally
         if flipped:
             hitmap = hitmap[::-1]
-        print board, "".join(hitmap), sorted(hits.get(board, [])), "(flipped)" if flipped else ""
+        print board, "".join(hitmap), sorted(hits.get(board, [])), "(f)" if flipped else ""
 
         # delimit the quadruplets
         if boards.index(board) == 3:
@@ -268,7 +268,7 @@ def options():
     parser = argparse.ArgumentParser(usage=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("-i", default="default",   help="Input raw text file")
     parser.add_argument("-r", default="3516",      help="Run number")
-    parser.add_argument("-b", default="128",       help="Number of bins to show 512 channels")
+    parser.add_argument("-b", default="64",       help="Number of bins to show 512 channels")
     parser.add_argument("-n", default="1",         help="Number of events to display")
     parser.add_argument("-l", action="store_true", help="Start with the last event and loop backward in time")
     parser.add_argument("-v", action="store_true", help="Turn on verbose mode")
