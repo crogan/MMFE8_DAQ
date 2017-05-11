@@ -255,8 +255,8 @@ def trigger_unmap(board):
 
 def trigger_offset(board):
     if   board in [0, 1, 2, 3] : return 64
-    elif board in [4, 5]       : return 71
-    elif board in [6, 7]       : return 58
+    elif board in [4, 5]       : return 58
+    elif board in [6, 7]       : return 71
     fatal("I cant fucking offset %s" % board)
 
 def fatal(message):
