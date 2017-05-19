@@ -233,6 +233,8 @@ class Trigger(object):
     def __init__(self, fitter_line):
         if not len(fitter_line) == 104:
             fatal("Expected fitter line of length 104, but got %s" % (fitter_line))
+        if not fitter_line.startswith("A3"):
+            fatal("Expected fitter header A3 was not found! Got:\n %s" % (fitter_line))
         self.data   = fitter_line
         self.bcid   = int(self.data[5:8], base=16)
         self.strips = [int(self.data[8+4*it : 8+4*(it+1)], base=16) for it in xrange(8)]
