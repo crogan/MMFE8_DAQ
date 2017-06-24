@@ -1,12 +1,12 @@
-#
-# To run me in real time, do:
-#    > while true; do clear; python ascii_display.py -l; sleep 2; done
-#
-# Format assumed:
-# 111 1488579780462268160.000000 2 0 0x688000cb K 0x44a10010 0xa67057 0xb0000783 
-#
-# NB: Boards 0, 3, 5, 6 are flipped!
-#
+"""
+To run me in real time, do:
+   > while true; do clear; python ascii_display.py -l; sleep 2; done
+
+Format assumed:
+111 1488579780462268160.000000 2 0 0x688000cb K 0x44a10010 0xa67057 0xb0000783 
+
+NB: Boards 0, 3, 5, 6 are flipped!
+"""
 
 import argparse
 import os
@@ -164,7 +164,7 @@ def display(bc, boards, hits, preamble=False):
 
     ops = options()
     channels = 512
-    marker = color.RED+color.BOLD+"x"+color.END if not ops.t else color.BLUE+color.BOLD+"x"+color.END
+    marker = marker_tp() if ops.t else marker_mm()
 
     if preamble:
         print
@@ -175,6 +175,25 @@ def display(bc, boards, hits, preamble=False):
     print "Trigger = 0x%s = %i" % (bc, int(bc, base=16))
     print
 
+    # map global hits to vmm/channel
+    hits_vmm = {}
+    for bo in hits:
+        string = ""
+        chs_gl = sorted(hits[bo])
+        vmms = sorted(list(set([ch / 64 for ch in chs_gl])))
+        thisvmm = None
+        for ch_gl in chs_gl:
+            vmm = ch_gl / 64
+            ch  = ch_gl % 64
+            if vmm==thisvmm:
+                string = "%s,%s" % (string, ch)
+            else:
+                string = "%s %s/%s" % (string, vmm, ch)
+                thisvmm = vmm
+        string = string.strip()
+        hits_vmm[bo] = string
+
+    # print
     boards = ordered_boards()
     for board in boards:
         hitmap = ["."]*int(ops.b)
@@ -183,7 +202,8 @@ def display(bc, boards, hits, preamble=False):
         flipped = boards.index(board) not in [0, 3, 5, 6] and not ops.t # trigger flips internally
         if flipped:
             hitmap = hitmap[::-1]
-        print board, "".join(hitmap), sorted(hits.get(board, [])), "(f)" if flipped else ""
+        hits_print = sorted(hits.get(board, [])) if ops.g else hits_vmm.get(board, "[]")
+        print board, "".join(hitmap), hits_print, "(f)" if flipped else ""
 
         # delimit the quadruplets
         if boards.index(board) == 3:
@@ -214,9 +234,19 @@ class color:
     BOLD      = "\033[1m"
     UNDERLINE = "\033[4m"
 
+def marker_tp():
+    return color.BLUE+color.BOLD+"x"+color.END
+
+def marker_mm():
+    return color.RED +color.BOLD+"x"+color.END
+
 def ordered_boards():
     ops = options()
-    if int(ops.r) >= 3518:
+    if int(ops.r) >= 3525:
+        return ["118", "111", "120", "119", "106", "107", "101", "105"][::-1]
+    elif int(ops.r) >= 3524:
+        return ["118", "116", "102", "119", "106", "107", "101", "105"][::-1]
+    elif int(ops.r) >= 3518:
         return ["118", "116", "102", "119", "106", "107", "117", "105"][::-1]
     elif int(ops.r) >= 3515:
         return ["111", "116", "117", "119", "106", "107", "118", "105"][::-1]
@@ -233,6 +263,8 @@ class Trigger(object):
     def __init__(self, fitter_line):
         if not len(fitter_line) == 104:
             fatal("Expected fitter line of length 104, but got %s" % (fitter_line))
+        if not fitter_line.startswith("A3"):
+            fatal("Expected fitter header A3 was not found! Got:\n %s" % (fitter_line))
         self.data   = fitter_line
         self.bcid   = int(self.data[5:8], base=16)
         self.strips = [int(self.data[8+4*it : 8+4*(it+1)], base=16) for it in xrange(8)]
@@ -267,11 +299,12 @@ def options():
     mmtp22    = "/data/mm_2016/work/mmtp_test_22.dat"
     parser = argparse.ArgumentParser(usage=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("-i", default="default",   help="Input raw text file")
-    parser.add_argument("-r", default="3516",      help="Run number")
-    parser.add_argument("-b", default="64",       help="Number of bins to show 512 channels")
+    parser.add_argument("-r", default="3526",      help="Run number")
+    parser.add_argument("-b", default="64",        help="Number of bins to show 512 channels")
     parser.add_argument("-n", default="1",         help="Number of events to display")
     parser.add_argument("-l", action="store_true", help="Start with the last event and loop backward in time")
     parser.add_argument("-v", action="store_true", help="Turn on verbose mode")
+    parser.add_argument("-g", action="store_true", help="Display global strip number instead of VMM/channel")
     parser.add_argument("-t", action="store_true", help="Display the trigger readout instead of the full readout")
     return parser.parse_args()
 
