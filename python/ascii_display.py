@@ -150,8 +150,9 @@ def parse_micromegas(lines):
             bcs.append(bc)
 
         # process and decode
-        boards.append(board)
-        hits[board] = []
+        if board not in boards:
+            boards.append(board)
+            hits[board] = []
         while words:
             word  = words.pop(0)
             dummy = words.pop(0)
