@@ -20,9 +20,9 @@ from channel import index
 
 ######################################################################################################### 
 
-def newcal(mmfei, vmmis, ThresholdDACs, TestPulseDAC,
+def newcal(mmfei, vmmis, ThresholdDACs, TestPulseDAC, PeakingTime,
            SM, ST, EnableReadout, ConfigureLoad, 
-           ip, ExternalTrigger, isExtPulseTrig):   
+           ip, ExternalTrigger, isExtPulseTrig, mon):   
 
     # set mmfe number
     gui.combo_mmfe_number.set_active(mmfei)
@@ -44,6 +44,11 @@ def newcal(mmfei, vmmis, ThresholdDACs, TestPulseDAC,
         gui.vmm_number_combo.set_active(vmmi)
         gui.set_current_vmm(gui.vmm_number_combo)
 
+        # set monitor output
+        if mon and vmmi in mon:
+            announce(" %s VMM %s, MON %s " % (mmfe, vmmi, mon[vmmi]))
+            gui.vmm_sm_menu.set_active(mon[vmmi] - 1)
+
         # set Threshold DAC
         announce(" %s VMM %s, THDAC %s" % (mmfe, vmmi, ThresholdDACs[vmmi]))
         gui.vmm_sdt_menu.set_active(ThresholdDACs[vmmi])
@@ -56,6 +61,13 @@ def newcal(mmfei, vmmis, ThresholdDACs, TestPulseDAC,
             gui.vmm_callback_word(gui.vmm_sdp2_menu, registers.SDP2, registers.bits_SDP2)
         else:
             announce(" %s VMM %s, TPDAC ignored" % (mmfe, vmmi))
+
+        if PeakingTime:
+            announce(" %s VMM %s, pktime %s" % (mmfe, vmmi, PeakingTime))
+            gui.vmm_st_menu.set_active(PeakingTime)
+            gui.vmm_callback_word(gui.vmm_st_menu, registers.ST, registers.bits_ST)
+        else:
+            announce(" %s VMM %s, pktime ignored" % (mmfe, vmmi))
 
         # set test pulse channels
         if ST and vmmi in ST:
@@ -71,20 +83,21 @@ def newcal(mmfei, vmmis, ThresholdDACs, TestPulseDAC,
         for channel in range(nchannels):
             gui.channel_SM[channel-1].set_active(0)
             gui.channel_callback_bit(gui.channel_SM[channel-1], channel-1, index.SM)
-        for channel in SM[vmmi]:
-            announce(" %s VMM %s, mask CH %2s" % (mmfe, vmmi, channel))
-            gui.channel_SM[channel-1].set_active(1)
-            gui.channel_callback_bit(gui.channel_SM[channel-1], channel-1, index.SM)
-        if not SM[vmmi]:
+        if not vmmi in SM or not SM[vmmi]:
             announce(" %s VMM %s, mask nothing" % (mmfe, vmmi))
-
+        else:
+            for channel in SM[vmmi]:
+                announce(" %s VMM %s, mask CH %2s" % (mmfe, vmmi, channel))
+                gui.channel_SM[channel-1].set_active(1)
+                gui.channel_callback_bit(gui.channel_SM[channel-1], channel-1, index.SM)
+            
     # enable readout
     for choice in EnableReadout:
         announce(" %s VMM %s, enable readout" % (mmfe, choice))
         gui.vmm_readout_buttons[choice].set_active(1)
         gui.readout_vmm_callback(gui.vmm_readout_buttons[choice], choice)
     if not EnableReadout:
-        announce(" %s VMM %s, readout no VMMs" % (mmfe))
+        announce(" %s readout no VMMs" % (mmfe))
 
     # load it
     announce(" %s load readout" % (mmfe))
@@ -96,7 +109,7 @@ def newcal(mmfei, vmmis, ThresholdDACs, TestPulseDAC,
         gui.vmm_load_buttons[choice].set_active(1)
         gui.load_vmm_callback(gui.vmm_load_buttons[choice], choice)
     if not ConfigureLoad:
-        announce(" %s VMM %s, configure/load no VMMs" % (mmfe))
+        announce(" %s configure/load no VMMs" % (mmfe))
 
     # load it
     announce(" %s load config" % (mmfe))
@@ -149,9 +162,9 @@ if not show:
 
 # loop over board configs
 for cfg in cfgs:
-    newcal(cfg.i, cfg.vmmis, cfg.ThresholdDACs, cfg.TestPulseDAC, 
+    newcal(cfg.i, cfg.vmmis, cfg.ThresholdDACs, cfg.TestPulseDAC, cfg.PeakingTime,
            cfg.SM, cfg.ST, cfg.EnableReadout, cfg.ConfigureLoad, 
-           cfg.ip, cfg.ExternalTrigger, cfg.isExtPulseTrig)
+           cfg.ip, cfg.ExternalTrigger, cfg.isExtPulseTrig, cfg.mon)
 
 end   = time.time()
 delta = int(end-start)
