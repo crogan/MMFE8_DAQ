@@ -101,6 +101,16 @@ class GUI:
         self.box_acq_reset_hold.pack_start(self.entry_acq_reset_hold, expand=False)
         self.box_acq_reset_hold.pack_start(self.label_acq_reset_hold, expand=False)
 
+        self.label_readout_time = gtk.Label("")
+        self.label_readout_time.set_markup('<span color="red"> Readout time in ms [enter]</span>')
+        self.label_readout_time.set_justify(gtk.JUSTIFY_LEFT)
+        self.entry_readout_time = gtk.Entry(max=8)
+        self.entry_readout_time.set_size_request(140, -1)
+        self.entry_readout_time.connect("activate", self.set_readout_time)
+        self.box_readout_time = gtk.HBox()
+        self.box_readout_time.pack_start(self.entry_readout_time, expand=False)
+        self.box_readout_time.pack_start(self.label_readout_time, expand=False)
+
         self.label_user_udp = gtk.Label("")
         self.label_user_udp.set_markup('<span color="red"> Send User UDP [enter]</span>')
         self.label_user_udp.set_justify(gtk.JUSTIFY_LEFT)
@@ -303,6 +313,7 @@ class GUI:
         self.box_mmfe.pack_start(self.box_pulses,                    expand=False)
         self.box_mmfe.pack_start(self.box_acq_reset_count,           expand=False)
         self.box_mmfe.pack_start(self.box_acq_reset_hold,            expand=False)
+        self.box_mmfe.pack_start(self.box_readout_time,              expand=False)
         self.box_mmfe.pack_start(self.box_user_udp,                  expand=False)
         self.box_mmfe.pack_start(self.vspace(),                      expand=False)
 
@@ -874,7 +885,7 @@ class GUI:
             return
         if value < 0 or value > 0xffffffff: #0x3E7
             print "Acq count value out of range"
-            print "0 <= acq_count <= 0xffffffff" 
+            print "0 <= acq_count <= 0xffffffff"
             return
 
         for mmfe in self.current_MMFEs():
@@ -905,11 +916,25 @@ class GUI:
             return
         if value < 0 or value > 0xffffffff: #0x3E7
             print "Acq hold value out of range"
-            print "0 <= acq_hold <= 0xffffffff" 
+            print "0 <= acq_hold <= 0xffffffff"
             return
 
         for mmfe in self.current_MMFEs():
             mmfe.set_acq_reset_hold(widget)
+
+    def set_readout_time(self, widget):
+        try:
+            value = float(widget.get_text())
+        except ValueError:
+            print "readout_time value must be a float or int"
+            return
+        if value < 0 or value > 0xFFFFFF:
+            print "Readout time value out of range"
+            print "0 <= Readout time <= 0xffffff"
+            return
+
+        for mmfe in self.current_MMFEs():
+            mmfe.set_readout_time(widget)
 
     def start(self, widget):
         for mmfe in self.current_MMFEs():
@@ -1075,6 +1100,7 @@ class GUI:
         self.entry_pulses.set_text(str(mmfe.pulses))
         self.entry_acq_reset_count.set_text(str(mmfe.acq_reset_count))
         self.entry_acq_reset_hold.set_text(str(mmfe.acq_reset_hold))
+        self.entry_readout_time.set_text(str(mmfe.readout_time))
         self.entry_user_udp.set_text(mmfe.udp_message)
         self.entry_mmfeID.set_text(str(mmfe.mmfeID))
 

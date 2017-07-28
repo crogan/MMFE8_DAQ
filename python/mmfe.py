@@ -44,6 +44,7 @@ class MMFE:
         self.pulses          = 0
         self.acq_reset_count = 0
         self.acq_reset_hold  = 0
+        self.readout_time    = 0
 
         self.internal_trigger_on       = 0
         self.external_trigger_on       = 0
@@ -304,6 +305,14 @@ class MMFE:
         message = "w 0x44A10124 %s" % (value)
         print "Writing %s counts to acq. hold" % (value)
         self.acq_reset_hold = value
+        self.udp.udp_client(message, self.UDP_IP, self.UDP_PORT)
+
+    def set_readout_time(self, widget, entry=None):
+        milliseconds = float(widget.get_text())
+        value = format(int(milliseconds * 1e6 / 25.0), "X")
+        message = "w 0x44A1014C 0x%s" % (value)
+        print "Writing %s ms => %s BC to readout time" % (milliseconds, value)
+        self.readout_time = value
         self.udp.udp_client(message, self.UDP_IP, self.UDP_PORT)
 
     def start(self):
