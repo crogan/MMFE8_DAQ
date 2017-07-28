@@ -310,7 +310,7 @@ class MMFE:
     def set_readout_time(self, widget, entry=None):
         milliseconds = float(widget.get_text())
         value = format(int(milliseconds * 1e6 / 25.0), "X")
-        message = "w 0x44A1014C %s" % (value)
+        message = "w 0x44A1014C 0x%s" % (value)
         print "Writing %s ms => %s BC to readout time" % (milliseconds, value)
         self.readout_time = value
         self.udp.udp_client(message, self.UDP_IP, self.UDP_PORT)
