@@ -30,6 +30,10 @@ def main():
 
     while True:
 
+        # protection
+        if not os.path.isfile(data):
+            fatal("The data file doesnt exist (%s)" % (data))
+
         # patience
         if first:
             first = False
@@ -48,10 +52,6 @@ def main():
             timestamp = line.pop(0)
             boards.append(int(board))
             times.append(float(timestamp)*1e-9)
-
-        # protection
-        if not os.path.isfile(data):
-            fatal("The data file doesnt exist (%s)" % (data))
 
         # clean it up
         boards = sorted(list(set(boards)))
