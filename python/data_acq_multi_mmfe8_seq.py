@@ -55,6 +55,9 @@ class data_acq:
                     if (bcidold == bcidtemp):
                         continue
                     print "NTRIG: ",ntrigtemp
+                    myfile = open('../../work/mmfe8TestQuiet.dat', 'a')
+                    myfile.write("new event\n\n")
+                    myfile.close()
                     bcidold = bcidtemp
                     with cond:
                         cond.notify_all()
