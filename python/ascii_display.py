@@ -113,6 +113,7 @@ def parse_micromegas(lines):
 
     ops = options()
 
+    events = 0
     bcs    = []
     boards = []
     hits   = {}
@@ -125,6 +126,18 @@ def parse_micromegas(lines):
         if ops.v:
             print "Processing line: %s" % (line)
 
+        # delimit by new event
+        if "new event" in line:
+            if len(bcs) == 0:
+                continue
+            if events >= int(ops.n):
+                break
+            display(bcs[-1], boards, hits, preamble=(events==0))
+            boards  = []
+            hits    = {}
+            events += 1
+            continue
+
         # decode
         words = line.split()
         board     = words.pop(0)
@@ -135,18 +148,9 @@ def parse_micromegas(lines):
         char      = words.pop(0)
         command   = words.pop(0)
 
-        # delimit by BC
-        bc = header_bc[-5:]
+        # get the BC
+        bc = header_bc[-4:]
         if bc not in bcs:
-            # new bc!
-            if len(bcs) > 0:
-                if len(bcs) <= int(ops.n):
-                    # display and reset
-                    display(bcs[-1], boards, hits, preamble=(len(bcs)==1))
-                    boards = []
-                    hits = {}
-                else:
-                    break
             bcs.append(bc)
 
         # process and decode
@@ -243,7 +247,9 @@ def marker_mm():
 
 def ordered_boards():
     ops = options()
-    if int(ops.r) >= 3525:
+    if int(ops.r) >= 3540:
+        return ["119", "124", "122", "126", "106", "109", "125", "123"][::-1]
+    elif int(ops.r) >= 3525:
         return ["118", "111", "120", "119", "106", "107", "101", "105"][::-1]
     elif int(ops.r) >= 3524:
         return ["118", "116", "102", "119", "106", "107", "101", "105"][::-1]
