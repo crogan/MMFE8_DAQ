@@ -92,6 +92,8 @@ class MMFE:
             check_reading_str = check_reading.split()
         except AttributeError:
             print check_reading
+            print "checking data error!"
+            return 0
 #        print check_reading_str #comment this out later!
         ready = 0
 #        print check_reading_str[2]
@@ -112,7 +114,8 @@ class MMFE:
         check_bcidreg_str = check_bcidreg.split()
         self.bcid_reg = check_bcidreg_str[2]
         word = int(self.bcid_reg, 16)
-        num_trig = int(word & 1048575)
+        num_trig = int(word & 65535)
+        #num_trig = int(word & 1048575)
         if (self.num_trigOld > num_trig):
             self.cyclenum = self.cyclenum + 1
         self.num_trigOld = num_trig
