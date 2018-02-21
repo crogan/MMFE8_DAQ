@@ -274,8 +274,9 @@ class Trigger(object):
             fatal("Expected fitter header A3 was not found! Got:\n %s" % (fitter_line))
         self.data   = fitter_line
         self.bcid   = int(self.data[5:8], base=16)
-        self.strips = [int(self.data[8+4*it : 8+4*(it+1)], base=16) for it in xrange(8)]
+        self.strips = [int(self.data[40+4*it : 40+4*(it+1)], base=16) for it in xrange(8)]
         self.strips = self.strips[::-1] # now self.strips[0] is the strip of board 0
+        self.strips = [strip-512+8 if strip > 511 else strip for strip in self.strips]
         self.n      = sum([strip > 0 for strip in self.strips])
 
     def __lt__(self, other):
