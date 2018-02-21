@@ -274,7 +274,10 @@ class Trigger(object):
             fatal("Expected fitter header A3 was not found! Got:\n %s" % (fitter_line))
         self.data   = fitter_line
         self.bcid   = int(self.data[5:8], base=16)
+        self.mask   = int(self.data[2:4], base=16)
+        self.mask   = format(self.mask, "08b")
         self.strips = [int(self.data[40+4*it : 40+4*(it+1)], base=16) for it in xrange(8)]
+        self.strips = [0 if bit=="0" else strip for (bit,strip) in zip(self.mask, self.strips)] # the mask
         self.strips = self.strips[::-1] # now self.strips[0] is the strip of board 0
         self.strips = [strip-512+8 if strip > 511 else strip for strip in self.strips] # the overlap bit!
         self.n      = sum([strip > 0 for strip in self.strips])
